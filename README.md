@@ -20,6 +20,9 @@ Arduino库：
 * 普通独立按钮：[avdweb_Switch](https://github.com/avandalen/avdweb_Switch)
 * 串口通信：Wire
 
+注意事项：
+* 电位器需接在3.3v
+
 
 <hr/>
 
