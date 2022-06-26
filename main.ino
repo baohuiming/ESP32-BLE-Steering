@@ -9,7 +9,7 @@
 #define numOfHatSwitches 0
 #define enableX true
 #define enableY true
-#define enableZ false
+#define enableZ true
 #define enableRX false
 #define enableRY false
 #define enableRZ false
@@ -19,7 +19,7 @@
 #define enableThrottle false
 #define enableAccelerator true
 #define enableBrake true
-#define enableSteering true
+#define enableSteering false
 #define fullAngle 900
 #define halfAngle 450
 #define joystickXPin 25
@@ -34,6 +34,7 @@ BleGamepad bleGamepad("ESP32 Gamepad", "Baohuiming.top", 100);
 float CurrentAngle;
 float CurrentMPUAngle;
 float DeltaAngle = 0.0;
+int CurrentAngleAxis = 0;
 
 // 4x4键盘
 const byte ROWS = 4;
@@ -96,8 +97,8 @@ void readjoystick() {
   // 上下：X
   // 左右：Y
   float XValue = (rawXValue - 2048) / 2048 * 32767;
-  float YValue = (rawYValue - 2048) / 2048 * 32767;
-  bleGamepad.setAxes(XValue, YValue, 0, 0, 0, 0, 0, 0);
+  float YValue = (rawYValue - 2048) / 2048 * -32767;
+  bleGamepad.setAxes(CurrentAngleAxis, XValue, YValue, 0, 0, 0, 0, 0);
 }
 
 void setup() {
@@ -136,7 +137,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // 控制器
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);  // 帽子开关数量
   bleGamepadConfig.setVid(0x3b2b); // 厂商号
-  bleGamepadConfig.setPid(0x2201); // 型号（版本号）
+  bleGamepadConfig.setPid(0x2300); // 型号（版本号）
 
   bleGamepad.begin(&bleGamepadConfig);
 
@@ -151,7 +152,7 @@ void setup() {
   bleGamepad.setAxes(0, 0, 0, 0, 0, 0, 0, 0);
 
   // Set steering to center
-  bleGamepad.setSteering(0);
+  // bleGamepad.setSteering(0);
 }
 
 void moveSteering(float angle) {
@@ -166,11 +167,11 @@ void moveSteering(float angle) {
   else if (angle < -1 * halfAngle) {
     angle = -1 * halfAngle;
   }
-  int i = angle / halfAngle * 32767;
+  CurrentAngleAxis = angle / halfAngle * 32767;
 
   // 设置当前角度
   CurrentAngle = angle;
-  bleGamepad.setSteering(i);
+  // bleGamepad.setSteering(i);
 }
 
 void loop() {
@@ -235,14 +236,14 @@ void loop() {
     gearDrive.poll();
     gearReverse.poll();
 
-    // 摇杆
-    joystickButton.poll();
-    readjoystick();
-
     // 识别和校正转动角度
     mpu6050.update();
     CurrentMPUAngle = -mpu6050.getAngleZ();
     hallButton1.poll();
     moveSteering(CurrentMPUAngle + DeltaAngle);
+
+    // 摇杆
+    joystickButton.poll();
+    readjoystick();
   }
 }
