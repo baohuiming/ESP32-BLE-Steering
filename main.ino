@@ -22,7 +22,6 @@
 #define enableSteering true
 #define fullAngle 900
 #define halfAngle 450
-#define hallAngle (-112)
 #define rockerXPin 27
 #define rockerYPin 26
 
