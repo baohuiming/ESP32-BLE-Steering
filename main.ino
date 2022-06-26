@@ -22,8 +22,8 @@
 #define enableSteering true
 #define fullAngle 900
 #define halfAngle 450
-#define rockerXPin 27
-#define rockerYPin 26
+#define joystickXPin 25
+#define joystickYPin 26
 
 MPU6050 mpu6050(Wire);
 
@@ -49,7 +49,7 @@ Adafruit_Keypad customKeypad =  Adafruit_Keypad(makeKeymap(keys), rowPins, colPi
 Switch gearDrive = Switch(12);    // GPIO 12
 Switch gearReverse = Switch(13);  // GPIO 13
 Switch hallButton1 = Switch(14);
-Switch rockerButton = Switch(25);
+Switch joystickButton = Switch(27);
 
 void gearDrivePushedCallbackFunction(void *s) {
   bleGamepad.press((char)(15));
@@ -80,17 +80,17 @@ void hallButton1PushedCallbackFunction(void *s) {
   }
 }
 
-void rockerButtonPushedCallbackFunction(void *s) {
+void joystickButtonPushedCallbackFunction(void *s) {
   bleGamepad.press((char)(17));
 }
 
-void rockerButtonReleasedCallbackFunction(void *s) {
+void joystickButtonReleasedCallbackFunction(void *s) {
   bleGamepad.release((char)(17));
 }
 
-void readRocker() {
-  float rawXValue = analogRead(rockerXPin);
-  float rawYValue = analogRead(rockerYPin);
+void readjoystick() {
+  float rawXValue = analogRead(joystickXPin);
+  float rawYValue = analogRead(joystickYPin);
   // 右上： (0, 0)
   // 左下： (4096, 4096)
   // 上下：X
@@ -102,6 +102,8 @@ void readRocker() {
 
 void setup() {
   // Serial.begin(115200);
+  pinMode(joystickXPin, INPUT);
+  pinMode(joystickYPin, INPUT);
 
   // 4x4键盘
   customKeypad.begin();
@@ -112,8 +114,8 @@ void setup() {
   gearReverse.setPushedCallback(&gearReversePushedCallbackFunction);
   gearReverse.setReleasedCallback(&gearReverseReleasedCallbackFunction);
   hallButton1.setPushedCallback(&hallButton1PushedCallbackFunction);
-  rockerButton.setPushedCallback(&rockerButtonPushedCallbackFunction);
-  rockerButton.setReleasedCallback(&rockerButtonReleasedCallbackFunction);
+  joystickButton.setPushedCallback(&joystickButtonPushedCallbackFunction);
+  joystickButton.setReleasedCallback(&joystickButtonReleasedCallbackFunction);
 
   // 串口获取陀螺仪数据
   Wire.begin();
@@ -134,7 +136,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // 控制器
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);  // 帽子开关数量
   bleGamepadConfig.setVid(0x3b2b); // 厂商号
-  bleGamepadConfig.setPid(0x2200); // 型号（版本号）
+  bleGamepadConfig.setPid(0x2201); // 型号（版本号）
 
   bleGamepad.begin(&bleGamepadConfig);
 
@@ -145,11 +147,11 @@ void setup() {
   bleGamepad.setAccelerator(-32767);
   bleGamepad.setBrake(-32767);
 
-  // Set steering to center
-  bleGamepad.setSteering(0);
-
   // Set Axis
   bleGamepad.setAxes(0, 0, 0, 0, 0, 0, 0, 0);
+
+  // Set steering to center
+  bleGamepad.setSteering(0);
 }
 
 void moveSteering(float angle) {
@@ -234,8 +236,8 @@ void loop() {
     gearReverse.poll();
 
     // 摇杆
-    rockerButton.poll();
-    readRocker();
+    joystickButton.poll();
+    readjoystick();
 
     // 识别和校正转动角度
     mpu6050.update();
