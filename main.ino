@@ -89,7 +89,7 @@ void joystickButtonReleasedCallbackFunction(void *s) {
   bleGamepad.release((char)(17));
 }
 
-void readjoystick() {
+void readJoystick() {
   float rawXValue = analogRead(joystickXPin);
   float rawYValue = analogRead(joystickYPin);
   // 右上： (0, 0)
@@ -118,7 +118,7 @@ void setup() {
   joystickButton.setPushedCallback(&joystickButtonPushedCallbackFunction);
   joystickButton.setReleasedCallback(&joystickButtonReleasedCallbackFunction);
 
-  // 串口获取陀螺仪数据
+  // I2C获取陀螺仪数据
   Wire.begin();
 
   // 陀螺仪自动初始化，不建议手动设置
@@ -244,6 +244,6 @@ void loop() {
 
     // 摇杆
     joystickButton.poll();
-    readjoystick();
+    readJoystick();
   }
 }
