@@ -11,6 +11,7 @@ DIY ESP32 Bluetooth Steering
 * 霍尔传感器
 * 若干电位器（摇杆、踏板）
 * 按钮、拨动开关
+* 小型振动电机
 * Arduino 1.8.19
 
 Arduino库：
@@ -32,6 +33,7 @@ Previous work:
 * Hall sensor
 * Some potentiometer (rocker and pedal)
 * Buttons and switches
+* Small vibration motor
 * Arduino 1.8.19
 
 Arduino libraries:
