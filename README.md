@@ -20,7 +20,7 @@ Arduino库：
 * 普通独立按钮：[avdweb_Switch](https://github.com/avandalen/avdweb_Switch)
 * 串口通信：Wire
 
-注意事项：
+❗注意事项：
 * 电位器需接在3.3v
 
 
@@ -40,3 +40,6 @@ Arduino libraries:
 * MPU6050 angle detect：[MPU6050_tockn](https://github.com/tockn/MPU6050_tockn)
 * Normal independent button：[avdweb_Switch](https://github.com/avandalen/avdweb_Switch)
 * Serial communication：Wire
+
+❗Attention：
+* Connect potentiometer to +3.3v
