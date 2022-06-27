@@ -18,7 +18,7 @@ Arduino库：
 * 4x4矩阵键盘：[Adafruit Keypad](https://github.com/adafruit/Adafruit_Keypad)
 * MPU6050角度识别：[MPU6050_tockn](https://github.com/tockn/MPU6050_tockn)
 * 普通独立按钮：[avdweb_Switch](https://github.com/avandalen/avdweb_Switch)
-* 串口通信：Wire
+* I2C通信：Wire
 
 ❗注意事项：
 * 电位器需接在3.3v
@@ -39,7 +39,7 @@ Arduino libraries:
 * 4x4 matrix keypad：[Adafruit Keypad](https://github.com/adafruit/Adafruit_Keypad)
 * MPU6050 angle detect：[MPU6050_tockn](https://github.com/tockn/MPU6050_tockn)
 * Normal independent button：[avdweb_Switch](https://github.com/avandalen/avdweb_Switch)
-* Serial communication：Wire
+* I2C communication：Wire
 
 ❗Attention：
 * Connect potentiometer to +3.3v
