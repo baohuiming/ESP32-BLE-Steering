@@ -24,6 +24,7 @@
 #define halfAngle 450
 #define joystickXPin 25
 #define joystickYPin 26
+#define vibrationMotorPin 15
 
 MPU6050 mpu6050(Wire);
 
@@ -105,6 +106,7 @@ void setup() {
   // Serial.begin(115200);
   pinMode(joystickXPin, INPUT);
   pinMode(joystickYPin, INPUT);
+  pinMode(vibrationMotorPin, OUTPUT);
 
   // 4x4键盘
   customKeypad.begin();
@@ -137,7 +139,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // 控制器
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);  // 帽子开关数量
   bleGamepadConfig.setVid(0x3b2b); // 厂商号
-  bleGamepadConfig.setPid(0x2300); // 型号（版本号）
+  bleGamepadConfig.setPid(0x2310); // 型号（版本号）
 
   bleGamepad.begin(&bleGamepadConfig);
 
@@ -245,5 +247,13 @@ void loop() {
     // 摇杆
     joystickButton.poll();
     readJoystick();
+
+    // 角度大于900度时振动
+    if(CurrentAngle >= 450 || CurrentAngle <= -450){
+      digitalWrite(vibrationMotorPin, HIGH);
+    }
+    else{
+      digitalWrite(vibrationMotorPin, LOW);
+    }
   }
 }
