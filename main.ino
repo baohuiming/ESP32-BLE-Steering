@@ -25,6 +25,8 @@
 #define joystickXPin 25
 #define joystickYPin 26
 #define vibrationMotorPin 15
+#define brakePin 33
+#define acceleratorPin 32
 
 MPU6050 mpu6050(Wire);
 
@@ -102,10 +104,26 @@ void readJoystick() {
   bleGamepad.setAxes(CurrentAngleAxis, XValue, YValue, 0, 0, 0, 0, 0);
 }
 
+void readPedal() {
+  // max = 2800, min = 850
+  float rawBrakeValue = analogRead(brakePin);
+  float rawAcceleratorValue = analogRead(acceleratorPin);
+  float brakeValue = (rawBrakeValue - 850) / (2800 - 850)  * 32767;
+  if (brakeValue < 0) brakeValue = 0;
+  else if (brakeValue > 32767) brakeValue = 32767;
+  float acceleratorValue = (rawAcceleratorValue - 850) / (2800 - 850)  * 32767;
+  if (acceleratorValue < 0) acceleratorValue = 0;
+  else if (acceleratorValue > 32767) acceleratorValue = 32767;
+  bleGamepad.setBrake(brakeValue);
+  bleGamepad.setAccelerator(acceleratorValue);
+}
+
 void setup() {
   // Serial.begin(115200);
   pinMode(joystickXPin, INPUT);
   pinMode(joystickYPin, INPUT);
+  pinMode(brakePin, INPUT);
+  pinMode(acceleratorPin, INPUT);
   pinMode(vibrationMotorPin, OUTPUT);
 
   // 4x4键盘
@@ -139,7 +157,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // 控制器
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);  // 帽子开关数量
   bleGamepadConfig.setVid(0x3b2b); // 厂商号
-  bleGamepadConfig.setPid(0x2310); // 型号（版本号）
+  bleGamepadConfig.setPid(0x2400); // 型号（版本号）
 
   bleGamepad.begin(&bleGamepadConfig);
 
@@ -185,16 +203,6 @@ void loop() {
       if (e.bit.EVENT == KEY_JUST_PRESSED) {
         // 按下
         switch (e.bit.KEY) {
-          case 17: {
-              // 刹车
-              bleGamepad.setBrake(32767);
-              break;
-            }
-          case 18: {
-              // 油门
-              bleGamepad.setAccelerator(32767);
-              break;
-            }
           case 14: {
               // 手刹
               bleGamepad.press((char)(e.bit.KEY));
@@ -210,16 +218,6 @@ void loop() {
       else if (e.bit.EVENT == KEY_JUST_RELEASED) {
         // 松开
         switch (e.bit.KEY) {
-          case 17: {
-              // 刹车
-              bleGamepad.setBrake(-32767);
-              break;
-            }
-          case 18: {
-              // 油门
-              bleGamepad.setAccelerator(-32767);
-              break;
-            }
           case 14: {
               // 手刹
               bleGamepad.press((char)(e.bit.KEY));
@@ -237,6 +235,7 @@ void loop() {
     // 挂挡
     gearDrive.poll();
     gearReverse.poll();
+    readPedal();
 
     // 识别和校正转动角度
     mpu6050.update();
