@@ -45,8 +45,8 @@ const byte COLS = 4;
 char keys[ROWS][COLS] = {
   {17, 18, 5, 7}, {12, 13, 4, 1}, {11, 14, 3, 2}, {10, 9, 6, 8}
 };
-byte rowPins[ROWS] = {17, 5, 18, 19};  //行的接口引脚
-byte colPins[COLS] = {16, 4, 0, 2};    //列的接口引脚
+byte rowPins[ROWS] = {17, 5, 18, 19};  // 行的接口引脚
+byte colPins[COLS] = {16, 4, 0, 2};    // 列的接口引脚
 Adafruit_Keypad customKeypad =  Adafruit_Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 // 手动配置的按钮
@@ -93,6 +93,8 @@ void joystickButtonReleasedCallbackFunction(void *s) {
 }
 
 void readJoystick() {
+  // 设置死区
+  float neutralZone = 300;
   float rawXValue = analogRead(joystickXPin);
   float rawYValue = analogRead(joystickYPin);
   // 右上： (0, 0)
@@ -101,19 +103,29 @@ void readJoystick() {
   // 左右：Y
   float XValue = (rawXValue - 2048) / 2048 * 32767;
   float YValue = (rawYValue - 2048) / 2048 * -32767;
+  if (abs(rawXValue - 2048) < neutralZone) XValue = 0;
+  if (abs(rawYValue - 2048) < neutralZone) YValue = 0;
   bleGamepad.setAxes(CurrentAngleAxis, XValue, YValue, 0, 0, 0, 0, 0);
 }
 
 void readPedal() {
   // max = 2800, min = 850
+  // 创建一个从(850, 2800)到(-32767, 32767)的映射
+  float maxmV = 2800;
+  float minmV = 850;
+  float k = (32767 - (-32767)) / (maxmV - minmV);
+  float b = 32767 - k * maxmV;
+  
   float rawBrakeValue = analogRead(brakePin);
   float rawAcceleratorValue = analogRead(acceleratorPin);
-  float brakeValue = (rawBrakeValue - 850) / (2800 - 850)  * 32767;
-  if (brakeValue < 0) brakeValue = 0;
+  float brakeValue = rawBrakeValue * k + b;
+  float acceleratorValue = rawAcceleratorValue * k + b;
+
+  if (brakeValue < -32767) brakeValue = -32767;
   else if (brakeValue > 32767) brakeValue = 32767;
-  float acceleratorValue = (rawAcceleratorValue - 850) / (2800 - 850)  * 32767;
-  if (acceleratorValue < 0) acceleratorValue = 0;
+  if (acceleratorValue < -32767) acceleratorValue = -32767;
   else if (acceleratorValue > 32767) acceleratorValue = 32767;
+  
   bleGamepad.setBrake(brakeValue);
   bleGamepad.setAccelerator(acceleratorValue);
 }
@@ -157,7 +169,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // 控制器
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);  // 帽子开关数量
   bleGamepadConfig.setVid(0x3b2b); // 厂商号
-  bleGamepadConfig.setPid(0x2400); // 型号（版本号）
+  bleGamepadConfig.setPid(0x2410); // 型号（版本号）
 
   bleGamepad.begin(&bleGamepadConfig);
 
