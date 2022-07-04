@@ -13,11 +13,11 @@
 #define enableRX false
 #define enableRY false
 #define enableRZ false
-#define enableSlider1 false
+#define enableSlider1 true
 #define enableSlider2 false
 #define enableRudder false
 #define enableThrottle false
-#define enableAccelerator true
+#define enableAccelerator false
 #define enableBrake true
 #define enableSteering false
 #define fullAngle 900
@@ -38,6 +38,9 @@ float CurrentAngle;
 float CurrentMPUAngle;
 float DeltaAngle = 0.0;
 int CurrentAngleAxis = 0;
+float CurrentJoystickXValue = 0.0;
+float CurrentJoystickYValue = 0.0;
+int CurrentAcceleratorValue = -32767;
 
 // 4x4键盘
 const byte ROWS = 4;
@@ -97,15 +100,12 @@ void readJoystick() {
   float neutralZone = 300;
   float rawXValue = analogRead(joystickXPin);
   float rawYValue = analogRead(joystickYPin);
-  // 右上： (0, 0)
-  // 左下： (4096, 4096)
-  // 上下：X
-  // 左右：Y
-  float XValue = (rawXValue - 2048) / 2048 * 32767;
-  float YValue = (rawYValue - 2048) / 2048 * -32767;
-  if (abs(rawXValue - 2048) < neutralZone) XValue = 0;
-  if (abs(rawYValue - 2048) < neutralZone) YValue = 0;
-  bleGamepad.setAxes(CurrentAngleAxis, XValue, YValue, 0, 0, 0, 0, 0);
+  // 右上： (0, 0)， 左下： (4096, 4096)
+  // 上下：X， 左右：Y
+  if (abs(rawXValue - 2048) < neutralZone) CurrentJoystickXValue = 0;
+  else CurrentJoystickXValue = (rawXValue - 2048) / 2048 * 32767;
+  if (abs(rawYValue - 2048) < neutralZone) CurrentJoystickYValue = 0;
+  else CurrentJoystickYValue= (rawYValue - 2048) / 2048 * -32767;
 }
 
 void readPedal() {
@@ -127,7 +127,8 @@ void readPedal() {
   else if (acceleratorValue > 32767) acceleratorValue = 32767;
   
   bleGamepad.setBrake(brakeValue);
-  bleGamepad.setAccelerator(acceleratorValue);
+  CurrentAcceleratorValue = acceleratorValue;
+  // bleGamepad.setAccelerator(acceleratorValue);
 }
 
 void setup() {
@@ -169,7 +170,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering); // 控制器
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);  // 帽子开关数量
   bleGamepadConfig.setVid(0x3b2b); // 厂商号
-  bleGamepadConfig.setPid(0x2410); // 型号（版本号）
+  bleGamepadConfig.setPid(0x2420); // 型号（版本号）
 
   bleGamepad.begin(&bleGamepadConfig);
 
@@ -177,11 +178,11 @@ void setup() {
   // you call the begin function again
 
   // Set accelerator and brake to min
-  bleGamepad.setAccelerator(-32767);
+  //bleGamepad.setAccelerator(-32767);
   bleGamepad.setBrake(-32767);
 
   // Set Axis
-  bleGamepad.setAxes(0, 0, 0, 0, 0, 0, 0, 0);
+  bleGamepad.setAxes(0, 0, 0, 0, 0, 0, -32767, 0);
 
   // Set steering to center
   // bleGamepad.setSteering(0);
@@ -192,7 +193,6 @@ void moveSteering(float angle) {
   // i > 0, 顺时针
   // angle = angle - DeltaAngle;
   // DeltaAngle = 0;
-
   if (angle > halfAngle) {
     angle = halfAngle;
   }
@@ -247,7 +247,6 @@ void loop() {
     // 挂挡
     gearDrive.poll();
     gearReverse.poll();
-    readPedal();
 
     // 识别和校正转动角度
     mpu6050.update();
@@ -258,6 +257,11 @@ void loop() {
     // 摇杆
     joystickButton.poll();
     readJoystick();
+
+    // 踏板
+    readPedal();
+
+    bleGamepad.setAxes(CurrentAngleAxis, CurrentJoystickXValue, CurrentJoystickYValue, 0, 0, 0, CurrentAcceleratorValue, 0);
 
     // 角度大于900度时振动
     if(CurrentAngle >= 450 || CurrentAngle <= -450){
