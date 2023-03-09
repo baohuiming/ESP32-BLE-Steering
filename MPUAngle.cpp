@@ -1,5 +1,5 @@
 #include "MPUAngle.h"
-
+// 来源：https://github.com/kriswiner/MPU6050/blob/master/MPU6050Library/MPU6050IMU.ino
 void MPUAngle::MadgwickQuaternionUpdate(float ax, float ay, float az,
                                         float gyrox, float gyroy, float gyroz) {
   // short name local variable for readability
