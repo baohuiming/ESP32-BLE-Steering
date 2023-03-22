@@ -6,13 +6,13 @@
 #define numOfButtons 17
 #define numOfHatSwitches 0
 #define enableX false
-#define enableY true
-#define enableZ true
+#define enableY false
+#define enableZ false
 #define enableRX false
 #define enableRY false
 #define enableRZ false
-#define enableSlider1 false
-#define enableSlider2 false
+#define enableSlider1 true
+#define enableSlider2 true
 #define enableRudder false
 #define enableThrottle false
 #define enableAccelerator true
@@ -180,7 +180,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering);
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);
   bleGamepadConfig.setVid(0x3b2b);     // 厂商号
-  bleGamepadConfig.setPid(0x2900);     // 型号（版本号）
+  bleGamepadConfig.setPid(0x2910);     // 型号（版本号）
   bleGamepadConfig.setAxesMin(0x8001); // -32767，只针对摇杆，对刹车等无效
   bleGamepadConfig.setAxesMax(0x7FFF); // 32767，同上
 
@@ -193,8 +193,8 @@ void setup() {
   // Set steering to center
   bleGamepad.setSteering(midSmValue);
 
-  // bleGamepad.setAxes(currentJoystickXValue, currentJoystickYValue, 0, 0, 0, 0, 0, 0);
-  bleGamepad.setAxes(0, midAxValue, midAxValue, 0, 0, 0, 0, 0);
+  // Set sliders to center
+  bleGamepad.setSliders(midAxValue, midAxValue);
 
   // start MPU6050
   mpuAngle.init();
@@ -241,7 +241,7 @@ void loop() {
     readCustomButton();
 
     // 设置摇杆
-    bleGamepad.setAxes(0, currentJoystickXValue, currentJoystickYValue, 0, 0, 0, 0, 0);
+    bleGamepad.setSliders(currentJoystickXValue, currentJoystickYValue);
 
     // 振动
     setVibration();
