@@ -26,6 +26,7 @@ Arduino库：
 * 陀螺仪需接在5v
 * 11/23/2022更新：修改角度识别库，须将陀螺仪的x轴作为方向盘的转动轴，移除了霍尔传感器
 * 3/9/2023更新：移除了avdweb_Switch库，采用读电平的方式替代
+* 3/22/2023更新：增加按键的防抖功能
 
 
 <hr/>
@@ -51,3 +52,4 @@ Arduino libraries:
 * Connect gyroscope to +5v
 * 11/23/2022 updated：Modify MPU6050 library. The x-axis of the gyroscope must be used as the rotation axis of the steering wheel. The Hall sensor is removed.
 * 3/9/2023 updated：The module avdweb_Switch is removed.
+* 3/22/2023 updated: Add debounce function to the button.
