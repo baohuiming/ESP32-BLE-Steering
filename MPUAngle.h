@@ -2,7 +2,7 @@
 #define _MPU_ANGLE_H_
 
 #include <Arduino.h>
-#include "MPU6050.h" // https://github.com/ElectronicCats/mpu6050
+#include "MPU6050.h" // https://github.com/ElectronicCats/mpu6050 (v0.6.0)
 #include "Wire.h"
 
 class MPUAngle  // 类的声明

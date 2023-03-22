@@ -1,7 +1,7 @@
-#include "Adafruit_Keypad.h" // https://github.com/adafruit/Adafruit_Keypad
-#include "MPUAngle.h"
 #include <Arduino.h>
-#include <BleGamepad.h> // https://github.com/lemmingDev/ESP32-BLE-Gamepad (v0.5.3)
+#include <BleGamepad.h>      // https://github.com/lemmingDev/ESP32-BLE-Gamepad (v0.5.3)
+#include "Adafruit_Keypad.h" // https://github.com/adafruit/Adafruit_Keypad (v1.3.0)
+#include "MPUAngle.h"
 
 #define numOfButtons 17
 #define numOfHatSwitches 0
@@ -34,6 +34,7 @@
 #define minSmValue 0
 #define maxSmValue 32767
 #define midSmValue 16383
+#define debounceTime 100
 
 // 蓝牙设备名称、厂商名称、电池电量
 BleGamepad bleGamepad("ESP32 Gamepad", "Baohuiming.net", 100);
@@ -50,14 +51,15 @@ MPUAngle mpuAngle;
 // 4x4键盘
 const byte ROWS = 4;
 const byte COLS = 4;
-char keys[ROWS][COLS] = {
-  {18, 19, 5, 7},
-  {12, 13, 4, 1},
-  {11, 14, 3, 2},
-  {10, 9, 6, 8}};
+char keys[ROWS][COLS] = {{18, 19, 5, 7}, // 18和19是多余的，不会被读取到
+                         {12, 13, 4, 1},
+                         {11, 14, 3, 2},
+                         {10, 9, 6, 8}};
 byte rowPins[ROWS] = {17, 5, 18, 19}; // 行的接口引脚
 byte colPins[COLS] = {16, 4, 0, 2};   // 列的接口引脚
 Adafruit_Keypad customKeypad = Adafruit_Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
+unsigned long keyTimePress[14];       // 按键按下的时间
+unsigned long keyTimeRelease[14];     // 按键松开的时间
 
 void readJoystick() {
   // 设置死区
@@ -178,7 +180,7 @@ void setup() {
   bleGamepadConfig.setWhichSimulationControls(enableRudder, enableThrottle, enableAccelerator, enableBrake, enableSteering);
   bleGamepadConfig.setHatSwitchCount(numOfHatSwitches);
   bleGamepadConfig.setVid(0x3b2b);     // 厂商号
-  bleGamepadConfig.setPid(0x2802);     // 型号（版本号）
+  bleGamepadConfig.setPid(0x2900);     // 型号（版本号）
   bleGamepadConfig.setAxesMin(0x8001); // -32767，只针对摇杆，对刹车等无效
   bleGamepadConfig.setAxesMax(0x7FFF); // 32767，同上
 
@@ -199,12 +201,12 @@ void setup() {
 }
 
 void loop() {
-  customKeypad.tick();
   if (bleGamepad.isConnected()) {
+    customKeypad.tick();
     if (customKeypad.available()) {
       // 读取键盘数据
       keypadEvent e = customKeypad.read();
-      if (e.bit.EVENT == KEY_JUST_PRESSED) {
+      if (e.bit.EVENT == KEY_JUST_PRESSED && millis() - keyTimeRelease[e.bit.KEY - 1] > debounceTime) {
         // 按下
         switch (e.bit.KEY) {
         default: {
@@ -212,7 +214,8 @@ void loop() {
           break;
         }
         }
-      } else if (e.bit.EVENT == KEY_JUST_RELEASED) {
+        keyTimePress[e.bit.KEY - 1] = millis();
+      } else if (e.bit.EVENT == KEY_JUST_RELEASED && millis() - keyTimePress[e.bit.KEY - 1] > debounceTime) {
         // 松开
         switch (e.bit.KEY) {
         default: {
@@ -220,6 +223,7 @@ void loop() {
           break;
         }
         }
+        keyTimeRelease[e.bit.KEY - 1] = millis();
       }
     }
 
