@@ -59,7 +59,7 @@ Arduino库：
 Previous work:
 * ESP32(D/E)-Devkit (Enough GPIO/ADC pins)
 * MPU6050 gyroscope
-* Some potentiometer (rocker and pedal)
+* Some potentiometer (joystick and pedal)
 * Buttons and switches
 * Small vibration motor
 * Arduino（choose ESP32 board）
@@ -69,7 +69,7 @@ Pinout:
 ![ESP32-devkitC-V4](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/esp32-devkitC-v4-pinout.png "ESP32-devkitC-V4")
 | Wire color | Function                     | Pin  | Pin  | Function                     | Wire color |
 |------------|------------------------------|------|------|------------------------------|------------|
-| Yellow     | External VCC (Rocker VCC)    | 3V3  | GND  | External GND (Pedal GND)     | Orange     |
+| Yellow     | External VCC (Joystick VCC)    | 3V3  | GND  | External GND (Pedal GND)     | Orange     |
 |            |                              | EN   | 23   |                              |            |
 |            |                              | VP   | 22   | Gyroscope SCL                | Brown      |
 |            |                              | VN   | TX   |                              |            |
