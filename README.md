@@ -15,7 +15,7 @@ DIY ESP32 Bluetooth Steering
 * esptool
 
 管脚图：
-![ESP32-devkitC-V4](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/_images/esp32-devkitC-v4-pinout.png "ESP32-devkitC-V4")
+![ESP32-devkitC-V4](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/_images/esp32-devkitC-v4-pinout.png "ESP32-devkitC-V4")
 | 引线颜色 | 功能                        | 引脚 | 引脚 | 功能                        | 引线颜色 |
 |----------|-----------------------------|------|------|-----------------------------|----------|
 | 黄       | 外接VCC（摇杆VCC、踏板VCC） | 3V3  | GND  | 外接GND（踏板GND、电机GND） | 橙       |
@@ -66,7 +66,7 @@ Previous work:
 * esptool
 
 Pinout:
-![ESP32-devkitC-V4](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/_images/esp32-devkitC-v4-pinout.png "ESP32-devkitC-V4")
+![ESP32-devkitC-V4](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/_images/esp32-devkitC-v4-pinout.png "ESP32-devkitC-V4")
 | Wire color | Function                     | Pin  | Pin  | Function                     | Wire color |
 |------------|------------------------------|------|------|------------------------------|------------|
 | Yellow     | External VCC (Joystick VCC)    | 3V3  | GND  | External GND (Pedal GND)     | Orange     |
